@@ -53,7 +53,6 @@ begin
 
   imgSrc := nil;
   imgDst := nil;
-  imgSrcCopy := nil;
   try
     imgSrc := TBitmap.Create;
     imgDst := TBitmap.Create;
