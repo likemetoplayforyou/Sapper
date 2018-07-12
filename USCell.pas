@@ -16,6 +16,7 @@ type
     FIsBomb: boolean;
     FNearBombsCount: integer;
     FOpened: boolean;
+    FOnBeforeOpen: TCellNotifyEvent;
     FOnClick: TCellNotifyEvent;
 
     FPanel: TPanel;
@@ -33,6 +34,8 @@ type
     property IsBomb: boolean read FIsBomb write FIsBomb;
     property NearBombsCount: integer read FNearBombsCount write FNearBombsCount;
     property Opened: boolean read FOpened;
+    property OnBeforeOpen: TCellNotifyEvent
+      read FOnBeforeOpen write FOnBeforeOpen;
     property OnClick: TCellNotifyEvent read FOnClick write FOnClick;
   end;
 
@@ -99,6 +102,9 @@ const
 begin
   if FOpened then
     Exit;
+
+  if Assigned(FOnBeforeOpen) then
+    FOnBeforeOpen(Self);
 
   FButton.Visible := false;
 

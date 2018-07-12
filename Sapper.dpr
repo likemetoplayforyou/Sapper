@@ -11,7 +11,8 @@ uses
   USCellMatrix in 'USCellMatrix.pas',
   USCellType in 'USCellType.pas',
   USEnvironment in 'USEnvironment.pas',
-  USVDM in 'USVDM.pas' {SVDM};
+  USVDM in 'USVDM.pas' {SVDM},
+  UUniqueRandomizer in 'Core\UUniqueRandomizer.pas';
 
 {$R *.res}
 

@@ -32,7 +32,7 @@ implementation
 
 procedure TfrmMain.btnRestartClick(Sender: TObject);
 begin
-  FCellMatrix.InitCells;
+  FCellMatrix.Reset;
 end;
 
 

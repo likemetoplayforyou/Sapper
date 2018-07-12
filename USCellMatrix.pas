@@ -10,54 +10,75 @@ type
   TSCellMatrix = class(TCellMatrix)
   private
     FBombCount: integer;
+    FAnyCellOpen: boolean;
 
+    procedure CellBeforeOpen(ACell: TSCell);
     procedure CellClick(ACell: TSCell);
   protected
     function GetCellClass(ARow, ACol: integer): TCellClass; override;
     procedure InitCell(ACell: TCell; ARow, ACol: integer); override;
 
     procedure ResetCells;
-    procedure AssignBombs;
+    procedure AssignBombs(ASafeCell: TSCell);
     procedure InitEmptyCells;
     procedure OpenAllCells;
+    procedure InitCells(AFirstOpenCell: TSCell);
   public
     constructor Create(
       AContainer: TWinControl; ACellWidth, ARows, ACols, ABombCount: integer);
     procedure AfterConstruction; override;
 
-    procedure InitCells;
+    procedure Reset;
   end;
 
 
 implementation
 
+uses
+  Types,
+  UUniqueRandomizer;
 
 { TSCellMatrix }
 
 procedure TSCellMatrix.AfterConstruction;
 begin
   inherited;
-  InitCells;
 end;
 
 
-procedure TSCellMatrix.AssignBombs;
+procedure TSCellMatrix.AssignBombs(ASafeCell: TSCell);
 var
+  randomizer: TUniqueRandomizer;
   remains: integer;
+  coord: TIntegerDynArray;
   row, col: integer;
   cell: TSCell;
 begin
-  Randomize;
-  remains := FBombCount;
-  while remains > 0 do begin
-    row := Random(RowCount);
-    col := Random(ColCount);
+  randomizer := TUniqueRandomizer.Create([RowCount, ColCount]);
+  try
+    remains := FBombCount;
+    while remains > 0 do begin
+      coord := randomizer.Generate;
+      row := coord[0];
+      col := coord[1];
 
-    cell := Self.Cell[row, col] as TSCell;
-    if not cell.IsBomb then begin
-      cell.IsBomb := true;
-      Dec(remains);
+      cell := Self.Cell[row, col] as TSCell;
+      if (cell <> ASafeCell) and not cell.IsBomb then begin
+        cell.IsBomb := true;
+        Dec(remains);
+      end;
     end;
+  finally
+    randomizer.Free;
+  end;
+end;
+
+
+procedure TSCellMatrix.CellBeforeOpen(ACell: TSCell);
+begin
+  if not FAnyCellOpen then begin
+    InitCells(ACell);
+    FAnyCellOpen := true;
   end;
 end;
 
@@ -91,16 +112,15 @@ begin
   if ACell is TSCell then begin
     cell := TSCell(ACell);
     cell.OnClick := CellClick;
+    cell.OnBeforeOpen := CellBeforeOpen;
   end;
 end;
 
 
-procedure TSCellMatrix.InitCells;
+procedure TSCellMatrix.InitCells(AFirstOpenCell: TSCell);
 begin
-  ResetCells;
-  AssignBombs;
+  AssignBombs(AFirstOpenCell);
   InitEmptyCells;
-  Container.Enabled := true;
 end;
 
 
@@ -157,6 +177,13 @@ begin
       cell.Open(true);
     end;
   end;
+end;
+
+
+procedure TSCellMatrix.Reset;
+begin
+  FAnyCellOpen := false;
+  ResetCells;
 end;
 
 
