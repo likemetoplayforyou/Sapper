@@ -28,8 +28,11 @@ type
     function GetCell(ARow, ACol: integer): T;
   protected
     function DoGetEnumerator: TEnumerator<T>; override;
+
+    function CreateCell(ARow, ACol: integer): T; virtual;
   public
     constructor Create(ARows, ACols: integer);
+    procedure AfterConstruction; override;
 
     property RowCount: integer read FRowCount;
     property ColCount: integer read FColCount;
@@ -40,6 +43,21 @@ type
 implementation
 
 { TMatrix<T> }
+
+procedure TMatrix<T>.AfterConstruction;
+var
+  i, j: integer;
+  cell: T;
+begin
+  inherited;
+  for i := 0 to RowCount - 1 do begin
+    for j := 0 to ColCount - 1 do begin
+      cell := CreateCell(i, j);
+      FCells[i, j] := cell;
+    end;
+  end;
+end;
+
 
 constructor TMatrix<T>.Create(ARows, ACols: integer);
 var
@@ -52,6 +70,12 @@ begin
   SetLength(FCells, FRowCount);
   for i := 0 to FRowCount - 1 do
     SetLength(FCells[i], FColCount);
+end;
+
+
+function TMatrix<T>.CreateCell(ARow, ACol: integer): T;
+begin
+  Result := Default(T);
 end;
 
 
