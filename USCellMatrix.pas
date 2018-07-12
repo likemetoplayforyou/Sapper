@@ -14,15 +14,15 @@ type
 
     procedure CellBeforeOpen(ACell: TSCell);
     procedure CellClick(ACell: TSCell);
-  protected
-    function GetCellClass(ARow, ACol: integer): TCellClass; override;
-    procedure InitCell(ACell: TCell; ARow, ACol: integer); override;
 
     procedure ResetCells;
     procedure AssignBombs(ASafeCell: TSCell);
     procedure InitEmptyCells;
     procedure OpenAllCells;
     procedure InitCells(AFirstOpenCell: TSCell);
+  protected
+    function GetCellClass(ARow, ACol: integer): TCellClass; override;
+    procedure InitCell(ACell: TCell; ARow, ACol: integer); override;
   public
     constructor Create(
       AContainer: TWinControl; ACellWidth, ARows, ACols, ABombCount: integer);
