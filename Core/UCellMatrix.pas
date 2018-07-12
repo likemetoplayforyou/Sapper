@@ -19,6 +19,7 @@ type
 
     property Row: integer read FRow;
     property Col: integer read FCol;
+    property Matrix: TCellMatrix read FMatrix;
   end;
 
 
@@ -68,8 +69,8 @@ begin
     for j := 0 to FColCount - 1 do begin
       cell := CreateCell(i, j);
       FCells[i, j] := cell;
-//      if cell <> nil then
-//        InitCell(cell, i, j);
+      if cell <> nil then
+        InitCell(cell, i, j);
     end;
   end;
 end;

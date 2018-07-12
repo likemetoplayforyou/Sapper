@@ -1,7 +1,8 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'frmMain'
+  BorderIcons = [biSystemMenu]
+  Caption = 'Sapper'
   ClientHeight = 271
   ClientWidth = 250
   Color = clBtnFace
@@ -22,6 +23,15 @@ object frmMain: TfrmMain
     Height = 41
     Align = alTop
     TabOrder = 0
+    object btnRestart: TButton
+      Left = 86
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Restart'
+      TabOrder = 0
+      OnClick = btnRestartClick
+    end
   end
   object pnMap: TPanel
     Left = 0

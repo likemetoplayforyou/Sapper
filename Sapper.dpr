@@ -8,7 +8,10 @@ uses
   UButtonMatrix in 'Core\UButtonMatrix.pas',
   FlipReverseRotateLibrary in 'Libs\FlipReverseRotateLibrary.pas',
   USCell in 'USCell.pas',
-  USCellMatrix in 'USCellMatrix.pas';
+  USCellMatrix in 'USCellMatrix.pas',
+  USCellType in 'USCellType.pas',
+  USEnvironment in 'USEnvironment.pas',
+  USVDM in 'USVDM.pas' {SVDM};
 
 {$R *.res}
 
@@ -16,5 +19,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TSVDM, SVDM);
   Application.Run;
 end.
