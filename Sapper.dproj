@@ -54,6 +54,7 @@
 				<Form>SVDM</Form>
 			</DCCReference>
 			<DCCReference Include="Core\UUniqueRandomizer.pas"/>
+			<DCCReference Include="Core\UContainers.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
