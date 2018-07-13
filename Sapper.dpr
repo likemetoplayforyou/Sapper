@@ -13,7 +13,8 @@ uses
   USEnvironment in 'USEnvironment.pas',
   USVDM in 'USVDM.pas' {SVDM},
   UUniqueRandomizer in 'Core\UUniqueRandomizer.pas',
-  UContainers in 'Core\UContainers.pas';
+  UContainers in 'Core\UContainers.pas',
+  UTypes in 'Core\UTypes.pas';
 
 {$R *.res}
 
