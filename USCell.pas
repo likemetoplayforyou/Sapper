@@ -3,7 +3,7 @@ unit USCell;
 interface
 
 uses
-  Buttons, ExtCtrls, StdCtrls, Classes,
+  Buttons, ExtCtrls, StdCtrls, Classes, Controls,
   UCellMatrix, USCellType;
 
 type
@@ -16,8 +16,10 @@ type
     FIsBomb: boolean;
     FNearBombsCount: integer;
     FOpened: boolean;
+    FHasFlag: boolean;
     FOnBeforeOpen: TCellNotifyEvent;
     FOnClick: TCellNotifyEvent;
+    FOnSwitchFlag: TCellNotifyEvent;
 
     FPanel: TPanel;
     FButton: TBitBtn;
@@ -25,6 +27,9 @@ type
     FLabel: TLabel;
 
     procedure ButtonClick(Sender: TObject);
+    procedure ButtonMouseDown(
+      Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure SwitchFlag;
   public
     constructor Create(AMatrix: TCellMatrix; ARow, ACol: integer); override;
 
@@ -34,16 +39,19 @@ type
     property IsBomb: boolean read FIsBomb write FIsBomb;
     property NearBombsCount: integer read FNearBombsCount write FNearBombsCount;
     property Opened: boolean read FOpened;
+    property HasFlag: boolean read FHasFlag;
     property OnBeforeOpen: TCellNotifyEvent
       read FOnBeforeOpen write FOnBeforeOpen;
     property OnClick: TCellNotifyEvent read FOnClick write FOnClick;
+    property OnSwitchFlag: TCellNotifyEvent
+      read FOnSwitchFlag write FOnSwitchFlag;
   end;
 
 
 implementation
 
 uses
-  Controls, SysUtils, Graphics,
+  SysUtils, Graphics,
   USEnvironment;
 
 { TSCell }
@@ -54,6 +62,14 @@ begin
 
   if Assigned(FOnClick) then
     FOnClick(Self);
+end;
+
+
+procedure TSCell.ButtonMouseDown(
+  Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+    SwitchFlag;
 end;
 
 
@@ -75,6 +91,7 @@ begin
   FButton.Parent := FPanel;
   FButton.Align := alClient;
   FButton.OnClick := ButtonClick;
+  FButton.OnMouseDown := ButtonMouseDown;
   FButton.Visible := true;
 
   FImage := TImage.Create(AMatrix.Container);
@@ -100,7 +117,7 @@ const
   );
   BOMB_CELL_TYPE: array [boolean] of TSCellType = (ctBombRed, ctBomb);
 begin
-  if FOpened then
+  if FOpened or FHasFlag then
     Exit;
 
   if Assigned(FOnBeforeOpen) then
@@ -128,11 +145,30 @@ procedure TSCell.Reset;
 begin
   FIsBomb := false;
   FOpened := false;
+  FHasFlag := false;
   FNearBombsCount := 0;
 
   FImage.Visible := false;
   FLabel.Visible := false;
   FButton.Visible := true;
+  FButton.Glyph.Assign(nil);
+end;
+
+
+procedure TSCell.SwitchFlag;
+begin
+  if Opened then
+    Exit;
+
+  if FHasFlag then
+    FButton.Glyph.Assign(nil)
+  else
+    FButton.Glyph.Assign(Environment.GetImageByCellType(ctFlag).Picture.Bitmap);
+
+  FHasFlag := not FHasFlag;
+
+  if Assigned(FOnSwitchFlag) then
+    FOnSwitchFlag(Self);
 end;
 
 

@@ -32,6 +32,29 @@ object frmMain: TfrmMain
       TabOrder = 0
       OnClick = btnRestartClick
     end
+    object pnBombRemains: TPanel
+      Left = 200
+      Top = 1
+      Width = 49
+      Height = 39
+      Align = alRight
+      TabOrder = 1
+      object lblBombRemains: TLabel
+        Left = 13
+        Top = 7
+        Width = 22
+        Height = 23
+        Caption = '10'
+        Color = clRed
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Arial Black'
+        Font.Style = []
+        ParentColor = False
+        ParentFont = False
+      end
+    end
   end
   object pnMap: TPanel
     Left = 0

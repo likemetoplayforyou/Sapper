@@ -10,6 +10,7 @@ type
   TSVDM = class(TForm)
     imgBombSafe: TImage;
     imgBombRed: TImage;
+    imgFlag: TImage;
   private
     { Private declarations }
   public

@@ -4,22 +4,27 @@ interface
 
 uses
   Controls,
-  UCellMatrix, USCell;
+  UCellMatrix, USCell, UTypes;
 
 type
   TSCellMatrix = class(TCellMatrix)
   private
     FBombCount: integer;
+    FFlagCount: integer;
     FAnyCellOpen: boolean;
+    FOnSwitchFlag: TProcedure;
 
     procedure CellBeforeOpen(ACell: TSCell);
     procedure CellClick(ACell: TSCell);
+    procedure CellFlagSwitch(ACell: TSCell);
 
     procedure ResetCells;
     procedure AssignBombs(ASafeCell: TSCell);
     procedure InitEmptyCells;
     procedure OpenAllCells;
     procedure InitCells(AFirstOpenCell: TSCell);
+    procedure CheckWin;
+    procedure CheckNearSafe(ACell: TSCell);
   protected
     function GetCellClass(ARow, ACol: integer): TCellClass; override;
     procedure InitCell(ACell: TCell; ARow, ACol: integer); override;
@@ -29,13 +34,17 @@ type
     procedure AfterConstruction; override;
 
     procedure Reset;
+
+    property BombCount: integer read FBombCount;
+    property FlagCount: integer read FFlagCount;
+    property OnSwitchFlag: TProcedure read FOnSwitchFlag write FOnSwitchFlag;
   end;
 
 
 implementation
 
 uses
-  Types,
+  Types, Dialogs,
   UUniqueRandomizer;
 
 { TSCellMatrix }
@@ -85,8 +94,82 @@ end;
 
 procedure TSCellMatrix.CellClick(ACell: TSCell);
 begin
-  if ACell.IsBomb then
+  if ACell.HasFlag then
+    Exit;
+
+  if ACell.IsBomb then begin
     OpenAllCells;
+    Container.Enabled := false;
+  end
+  else begin
+    CheckNearSafe(ACell);
+
+    CheckWin;
+  end;
+end;
+
+
+procedure TSCellMatrix.CellFlagSwitch(ACell: TSCell);
+begin
+  if ACell.HasFlag then
+    Inc(FFlagCount)
+  else
+    Dec(FFlagCount);
+
+  if Assigned(FOnSwitchFlag) then
+    FOnSwitchFlag;
+end;
+
+
+procedure TSCellMatrix.CheckNearSafe(ACell: TSCell);
+
+  procedure tryOpenNear(ACell: TSCell; ARowDelta, AColDelta: integer);
+  var
+    nearRow: integer;
+    nearCol: integer;
+    nearCell: TSCell;
+  begin
+    nearRow := ACell.Row + ARowDelta;
+    nearCol := ACell.Col + AColDelta;
+    if ValidCell(nearRow, nearCol) then begin
+      nearCell := Cells[nearRow, nearCol] as TSCell;
+      if not nearCell.Opened then begin
+        nearCell.Open;
+        CheckNearSafe(nearCell);
+      end;
+    end;
+  end;
+
+begin
+  if ACell.NearBombsCount = 0 then begin
+    tryOpenNear(ACell, -1, -1);
+    tryOpenNear(ACell, -1,  0);
+    tryOpenNear(ACell, -1,  1);
+    tryOpenNear(ACell,  0, -1);
+    tryOpenNear(ACell,  0,  1);
+    tryOpenNear(ACell,  1, -1);
+    tryOpenNear(ACell,  1,  0);
+    tryOpenNear(ACell,  1,  1);
+  end;
+end;
+
+
+procedure TSCellMatrix.CheckWin;
+var
+  cell: TCell;
+  closeCount: integer;
+begin
+  closeCount := 0;
+  for cell in Self do begin
+    if not (cell as TSCell).Opened then
+      Inc(closeCount);
+
+    if closeCount > FBombCount then
+      Break;
+  end;
+
+  if closeCount = FBombCount then
+    ShowMessage('Congratulations, you win!');
 end;
 
 
@@ -113,6 +196,7 @@ begin
     cell := TSCell(ACell);
     cell.OnClick := CellClick;
     cell.OnBeforeOpen := CellBeforeOpen;
+    cell.OnSwitchFlag := CellFlagSwitch;
   end;
 end;
 
@@ -134,10 +218,7 @@ procedure TSCellMatrix.InitEmptyCells;
   begin
     nearRow := ACell.Row + ARowDelta;
     nearCol := ACell.Col + AColDelta;
-    if
-      (0 <= nearRow) and (nearRow < RowCount) and
-      (0 <= nearCol) and (nearCol < ColCount)
-    then begin
+    if ValidCell(nearRow, nearCol) then begin
       nearCell := Self.Cells[nearRow, nearCol] as TSCell;
       if nearCell.IsBomb then
         ACell.NearBombsCount := ACell.NearBombsCount + 1;
@@ -182,8 +263,12 @@ end;
 
 procedure TSCellMatrix.Reset;
 begin
+  FFlagCount := 0;
   FAnyCellOpen := false;
   ResetCells;
+  if Assigned(FOnSwitchFlag) then
+    FOnSwitchFlag;
+  Container.Enabled := true;
 end;
 
 

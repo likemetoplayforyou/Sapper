@@ -30,6 +30,8 @@ begin
     Result := SVDM.imgBombSafe
   else if ACellType = ctBombRed then
     Result := SVDM.imgBombRed
+  else if ACellType = ctFlag then
+    Result := SVDM.imgFlag
   else
     Result := nil;
 end;

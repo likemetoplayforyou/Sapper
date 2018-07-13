@@ -12,11 +12,15 @@ type
     pnStats: TPanel;
     pnMap: TPanel;
     btnRestart: TButton;
+    pnBombRemains: TPanel;
+    lblBombRemains: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnRestartClick(Sender: TObject);
   private
     FCellMatrix: TSCellMatrix;
+
+    procedure MatrixFlagCountSwitch;
   public
     { Public declarations }
   end;
@@ -47,6 +51,8 @@ begin
   FCellMatrix :=
     TSCellMatrix.Create(
       pnMap, CELL_WIDTH, MAP_ROW_COUNT, MAP_COL_COUNT, BOMB_COUNT);
+  FCellMatrix.OnSwitchFlag := MatrixFlagCountSwitch;
+  MatrixFlagCountSwitch;
 
   ClientHeight := pnStats.Height + MAP_ROW_COUNT * CELL_WIDTH;
   ClientWidth := MAP_ROW_COUNT * CELL_WIDTH;
@@ -65,5 +71,12 @@ begin
   FCellMatrix.Free;
   inherited;
 end;
+
+procedure TfrmMain.MatrixFlagCountSwitch;
+begin
+  lblBombRemains.Caption :=
+    IntToStr(FCellMatrix.BombCount - FCellMatrix.FlagCount);
+end;
+
 
 end.
