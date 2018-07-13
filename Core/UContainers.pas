@@ -34,6 +34,8 @@ type
     constructor Create(ARows, ACols: integer);
     procedure AfterConstruction; override;
 
+    function ValidCell(ARow, ACol: integer): boolean;
+
     property RowCount: integer read FRowCount;
     property ColCount: integer read FColCount;
     property Cells[ARow, ACol: integer]: T read GetCell; default;
@@ -91,6 +93,13 @@ begin
 end;
 
 
+function TMatrix<T>.ValidCell(ARow, ACol: integer): boolean;
+begin
+  Result :=
+    (0 <= ARow) and (ARow < RowCount) and (0 <= ACol) and (ACol < ColCount);
+end;
+
+
 { TMatrix<T>.TEnumerator }
 
 constructor TMatrix<T>.TEnumerator.Create(AMatrix: TMatrix<T>);
@@ -113,6 +122,8 @@ begin
   if (FRow >= FMatrix.RowCount) and (FCol >= FMatrix.ColCount) then
     Exit(false);
   Inc(FCol);
+  if FRow < 0 then
+    Inc(FRow);
   if FCol >= FMatrix.ColCount then begin
     Inc(FRow);
     FCol := 0;
