@@ -7,35 +7,35 @@ uses
   UContainers;
 
 type
-  //TCellMatrix<T> = class;
+  TCellMatrix = class;
 
 
   TCell = class(TObject)
   private
-    //FMatrix: TCellMatrix<TCell>;
+    FMatrix: TCellMatrix;
     FRow: integer;
     FCol: integer;
   public
-    constructor Create(
-      {AMatrix: TCellMatrix<TCell>; }ARow, ACol: integer); virtual;
+    constructor Create(AMatrix: TCellMatrix; ARow, ACol: integer); virtual;
 
     property Row: integer read FRow;
     property Col: integer read FCol;
-    //property Matrix: TCellMatrix<TCell> read FMatrix;
+    property Matrix: TCellMatrix read FMatrix;
   end;
 
 
   TCellClass = class of TCell;
 
 
-  TCellMatrix<T: TCell, constructor> = class(TMatrix<T>)
+  TCellMatrix = class(TMatrix<TCell>)
   private
     FContainer: TWinControl;
     FCellWidth: integer;
 
     procedure Log(const AMsg: string; const AArgs: array of const);
   protected
-    function CreateCell(ARow, ACol: integer): T; override;
+    function GetCellClass(ARow, ACol: integer): TCellClass; virtual;
+    function CreateCell(ARow, ACol: integer): TCell; override;
     procedure InitCell(ACell: TCell; ARow, ACol: integer); virtual;
   public
     constructor Create(
@@ -49,9 +49,9 @@ type
 
 implementation
 
-{ TCellMatrix<T> }
+{ TCellMatrix }
 
-constructor TCellMatrix<T>.Create(
+constructor TCellMatrix.Create(
   AContainer: TWinControl; ACellWidth, ARows, ACols: integer);
 begin
   inherited Create(ARows, ACols);
@@ -60,9 +60,9 @@ begin
 end;
 
 
-function TCellMatrix<T>.CreateCell(ARow, ACol: integer): T;
+function TCellMatrix.CreateCell(ARow, ACol: integer): TCell;
 begin
-  Result := T.Create({Self, }ARow, ACol);
+  Result := GetCellClass(ARow, ACol).Create(Self, ARow, ACol);
   InitCell(Result, ARow, ACol);
 //  if cellClass = nil then
 //    Exit;
@@ -77,7 +77,13 @@ begin
 end;
 
 
-procedure TCellMatrix<T>.InitCell(ACell: TCell; ARow, ACol: integer);
+function TCellMatrix.GetCellClass(ARow, ACol: integer): TCellClass;
+begin
+  Result := TCell;
+end;
+
+
+procedure TCellMatrix.InitCell(ACell: TCell; ARow, ACol: integer);
 begin
 //  ACell.Parent := FContainer;
 //  ACell.Width := FCellWidth;
@@ -87,13 +93,13 @@ begin
 end;
 
 
-procedure TCellMatrix<T>.Log(const AMsg: string; const AArgs: array of const);
+procedure TCellMatrix.Log(const AMsg: string; const AArgs: array of const);
 begin
 
 end;
 
 
-function TCellMatrix<T>.Width: integer;
+function TCellMatrix.Width: integer;
 begin
   Result := ColCount * FCellWidth;
 end;
@@ -101,7 +107,7 @@ end;
 
 { TCell }
 
-constructor TCell.Create(AMatrix: TCellMatrix<TCell>; ARow, ACol: integer);
+constructor TCell.Create(AMatrix: TCellMatrix; ARow, ACol: integer);
 begin
   inherited Create;
   FMatrix := AMatrix;

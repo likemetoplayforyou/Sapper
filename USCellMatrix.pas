@@ -62,7 +62,7 @@ begin
       row := coord[0];
       col := coord[1];
 
-      cell := Self.Cell[row, col] as TSCell;
+      cell := Self.Cells[row, col] as TSCell;
       if (cell <> ASafeCell) and not cell.IsBomb then begin
         cell.IsBomb := true;
         Dec(remains);
@@ -138,7 +138,7 @@ procedure TSCellMatrix.InitEmptyCells;
       (0 <= nearRow) and (nearRow < RowCount) and
       (0 <= nearCol) and (nearCol < ColCount)
     then begin
-      nearCell := Self.Cell[nearRow, nearCol] as TSCell;
+      nearCell := Self.Cells[nearRow, nearCol] as TSCell;
       if nearCell.IsBomb then
         ACell.NearBombsCount := ACell.NearBombsCount + 1;
     end;
@@ -150,7 +150,7 @@ var
 begin
   for i := 0 to RowCount - 1 do begin
     for j := 0 to ColCount - 1 do begin
-      cell := Self.Cell[i, j] as TSCell;
+      cell := Self.Cells[i, j] as TSCell;
       if not cell.IsBomb then begin
         tryIncNearBombCount(cell, -1, -1);
         tryIncNearBombCount(cell, -1,  0);
@@ -173,7 +173,7 @@ var
 begin
   for i := 0 to RowCount - 1 do begin
     for j := 0 to ColCount - 1 do begin
-      cell := Self.Cell[i, j] as TSCell;
+      cell := Self.Cells[i, j] as TSCell;
       cell.Open(true);
     end;
   end;
@@ -194,7 +194,7 @@ var
 begin
   for i := 0 to RowCount - 1 do begin
     for j := 0 to ColCount - 1 do begin
-      cell := Self.Cell[i, j] as TSCell;
+      cell := Self.Cells[i, j] as TSCell;
       cell.Reset;
     end;
   end;
